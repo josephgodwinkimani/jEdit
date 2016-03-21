@@ -5,9 +5,66 @@
     <artifactId>texteditor</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <name>jEdit</name>
+    <description>Simple Text editor</description>
+    <url>http://github.com/jgodwin13/jEdit</url>
+    <inceptionYear>2016</inceptionYear>
+    <developers>
+        <developer>
+            <id>jgodwin13</id>
+                <name>Joseph Godwin Kimani</name>
+                <email>josephgodwinke@gmail.com</email>
+                <organization>GHA Technologies</organization>
+                <roles>
+                    <role>Author</role>
+                </roles>                 
+            <timezone>Africa/Nairobi</timezone>
+        </developer>
+    </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
+    </properties> 
+      <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.5.1</version>
+          <configuration>
+            <!-- put your configurations here -->
+          <fork>true</fork>
+          <meminitial>128m</meminitial>
+          <maxmem>1024m</maxmem>
+          <timeout>10</timeout>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.10.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.0.0</version>
+      </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+       <dependencies>
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>3.8.1</version>
+          <scope>test</scope>
+        </dependency>
+          <dependency>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.9</version>
+        </dependency>
+     </dependencies>
 </project>

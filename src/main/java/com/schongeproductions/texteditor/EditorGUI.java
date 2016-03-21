@@ -409,7 +409,7 @@ public class EditorGUI extends JFrame implements ActionListener {
         } else if(event.getSource () == license) {
             License frame = new License ();
             frame.setVisible(true);
-            setDefaultCloseOperation(Licnese.DISPOSE_ON_CLOSE);
+            setDefaultCloseOperation(License.DISPOSE_ON_CLOSE);
         }
         
     }
