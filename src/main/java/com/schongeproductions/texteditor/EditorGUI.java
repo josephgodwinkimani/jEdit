@@ -23,9 +23,7 @@
  */
 package com.schongeproductions.texteditor;
 
-import Licenses.About;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -55,12 +53,14 @@ import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import Licenses.*;
+import java.awt.Image;
+import java.awt.Toolkit;
 
 
 @SuppressWarnings("serial")
 public class EditorGUI extends JFrame implements ActionListener {
 
-    public static void main(String[]args) {
+     public static void main(String[]args) {
         new EditorGUI();
         
     }
@@ -78,10 +78,10 @@ public class EditorGUI extends JFrame implements ActionListener {
     private JMenuItem aboutMe, license;
 
 
-    // Window
+    // Actual Window ==================
     private JFrame editorWindow;
-
-    // Text Area
+   //==================================
+    // Where to edit text..
     private Border textBorder;
     private JScrollPane scroll;
     private JTextArea textArea;
@@ -112,18 +112,18 @@ public class EditorGUI extends JFrame implements ActionListener {
     public EditorGUI() {
         super("jEdit");
 
-        // Create Menus
+       
         fileMenu();
         editMenu();
         aboutMenu();
 
-        // Create Text Area
+        
         createTextArea();
 
-        // Create Undo Manager for managing undo/redo commands
+        
         undoMan();
 
-        // Create Window
+        
         createEditorWindow();
     }
 
@@ -132,23 +132,21 @@ public class EditorGUI extends JFrame implements ActionListener {
         editorWindow.setVisible(true);
         editorWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
         editorWindow.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        // Create Menu Bar
         editorWindow.setJMenuBar(createMenuBar());
         editorWindow.add(scroll, BorderLayout.CENTER);
         editorWindow.pack();
-        // Centers application on screen
         editorWindow.setLocationRelativeTo(null);
-
+        Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/src/res/favicon.ico"));
+        setIconImage(image);
         return editorWindow;
     }
 
     private JTextArea createTextArea() {
-        textBorder = BorderFactory.createBevelBorder(0, Color.BLUE, Color.BLUE);
         textArea = new JTextArea(50, 70);
         textArea.setEditable(true);
         textArea.setBorder(BorderFactory.createCompoundBorder(textBorder, BorderFactory.createEmptyBorder(2, 5, 0, 0)));
 
-        textFont = new Font("Verdana", 0, 14);
+        textFont = new Font("Courier", 0, 14);
         textArea.setFont(textFont);
 
         scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -411,7 +409,7 @@ public class EditorGUI extends JFrame implements ActionListener {
         } else if(event.getSource () == license) {
             License frame = new License ();
             frame.setVisible(true);
-            setDefaultCloseOperation(License.DISPOSE_ON_CLOSE);
+            setDefaultCloseOperation(Licnese.DISPOSE_ON_CLOSE);
         }
         
     }
