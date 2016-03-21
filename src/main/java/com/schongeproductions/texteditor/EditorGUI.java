@@ -278,7 +278,7 @@ public class EditorGUI extends JFrame implements ActionListener {
         aboutMenu = new JMenu("About");
         aboutMenu.setPreferredSize(new Dimension(40, 20));
         
-        aboutMe = new JMenuItem("About me");
+        aboutMe = new JMenuItem("Author");
         aboutMe .addActionListener(this);
         aboutMe .setPreferredSize(new Dimension(100, 20));
         aboutMe .setEnabled(true);
