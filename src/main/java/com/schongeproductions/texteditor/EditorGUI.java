@@ -38,31 +38,29 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.swing.BorderFactory;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
+import javax.swing.text.html.ImageView;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+
 import Licenses.*;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 
 @SuppressWarnings("serial")
 public class EditorGUI extends JFrame implements ActionListener {
 
-     public static void main(String[]args) {
+    public static void main(String[] args) {
         new EditorGUI();
-        
+
     }
 
     //============================================
@@ -73,14 +71,14 @@ public class EditorGUI extends JFrame implements ActionListener {
     private JMenu fileMenu;
     private JMenu editMenu;
     private JMenu aboutMenu;
+    private JMenu helpMenu;
     private JMenuItem newFile, openFile, saveFile, saveAsFile, pageSetup, printFile, exit;
-    private JMenuItem undoEdit, redoEdit, selectAll, copy, paste, cut;
+    private JMenuItem undoEdit, redoEdit, selectAll, copy, paste, cut, wordwrap, timestamp;
     private JMenuItem aboutMe, license;
-
-
-    // Actual Window ==================
-    private JFrame editorWindow;
-   //==================================
+    private JMenuItem helpTopics;
+    
+            
+    //==================================
     // Where to edit text..
     private Border textBorder;
     private JScrollPane scroll;
@@ -104,7 +102,13 @@ public class EditorGUI extends JFrame implements ActionListener {
     // Undo manager for managing the storage of the undos
     // so that the can be redone if requested
     private UndoManager undo;
-   
+    
+    int i,len1,len,pos1;  
+    String str="";  
+    String months[]={"January","February","March","April","May","June","July","August","September","October","November","December"};  
+     
+
+
     //============================================
     // CONSTRUCTOR
     //============================================
@@ -112,33 +116,32 @@ public class EditorGUI extends JFrame implements ActionListener {
     public EditorGUI() {
         super("jEdit");
 
-       
+
         fileMenu();
         editMenu();
         aboutMenu();
+        helpMenu();
 
-        
         createTextArea();
 
-        
+
         undoMan();
 
-        
-        createEditorWindow();
+
+        createThis();
     }
 
-    private JFrame createEditorWindow() {
-        editorWindow = new JFrame("jEdit");
-        editorWindow.setVisible(true);
-        editorWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
-        editorWindow.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        editorWindow.setJMenuBar(createMenuBar());
-        editorWindow.add(scroll, BorderLayout.CENTER);
-        editorWindow.pack();
-        editorWindow.setLocationRelativeTo(null);
-        Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/src/res/favicon.ico"));
-        setIconImage(image);
-        return editorWindow;
+    private void createThis() {
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setJMenuBar(createMenuBar());
+        this.add(scroll, BorderLayout.CENTER);
+        this.pack();
+        this.setLocationRelativeTo(null);
+
+        ImageIcon img = new ImageIcon("res/jedit.png");
+        this.setIconImage(img.getImage());
+
+        this.setVisible(true);
     }
 
     private JTextArea createTextArea() {
@@ -151,7 +154,7 @@ public class EditorGUI extends JFrame implements ActionListener {
 
         scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-        return textArea;        
+        return textArea;
     }
 
     private JMenuBar createMenuBar() {
@@ -160,7 +163,8 @@ public class EditorGUI extends JFrame implements ActionListener {
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
         menuBar.add(aboutMenu);
-        
+        menuBar.add(helpMenu);
+
         return menuBar;
     }
 
@@ -263,6 +267,17 @@ public class EditorGUI extends JFrame implements ActionListener {
         cut.addActionListener(this);
         cut.setPreferredSize(new Dimension(100, 20));
         cut.setEnabled(true);
+        
+        wordwrap = new JMenuItem("Word wrap");
+        wordwrap.addActionListener(this);
+        wordwrap.setPreferredSize(new Dimension(100, 20));
+        wordwrap.setEnabled(true);
+        
+        
+        timestamp = new JMenuItem("Timestamp");
+        timestamp.addActionListener(this);
+        timestamp.setPreferredSize(new Dimension(100, 20));
+        timestamp.setEnabled(true);
 
         // Add items to menu
         editMenu.add(undoEdit);
@@ -271,27 +286,43 @@ public class EditorGUI extends JFrame implements ActionListener {
         editMenu.add(copy);
         editMenu.add(paste);
         editMenu.add(cut);
+        editMenu.add(wordwrap);
+        editMenu.add(timestamp);
     }
 
     private void aboutMenu() {
-        
+
         aboutMenu = new JMenu("About");
-        aboutMenu.setPreferredSize(new Dimension(40, 20));
-        
+        aboutMenu.setPreferredSize(new Dimension(50, 20));
+
         aboutMe = new JMenuItem("Author");
-        aboutMe .addActionListener(this);
-        aboutMe .setPreferredSize(new Dimension(100, 20));
-        aboutMe .setEnabled(true);
-        
+        aboutMe.addActionListener(this);
+        aboutMe.setPreferredSize(new Dimension(100, 20));
+        aboutMe.setEnabled(true);
+
         license = new JMenuItem("License");
-        license .addActionListener(this);
-        license .setPreferredSize(new Dimension(100, 20));
-        license .setEnabled(true);
-        
+        license.addActionListener(this);
+        license.setPreferredSize(new Dimension(100, 20));
+        license.setEnabled(true);
+
         aboutMenu.add(aboutMe);
         aboutMenu.add(license);
-        
+
     }
+    
+    private void helpMenu() {
+          
+        helpMenu = new JMenu("Help");
+        helpMenu.setPreferredSize(new Dimension(40, 20));
+        
+        helpTopics = new JMenuItem("Help Topics");
+        helpTopics.addActionListener(this);
+        helpTopics.setPreferredSize(new Dimension(100, 20));
+        helpTopics.setEnabled(true);
+        
+        helpMenu.add(helpTopics);
+        
+         }
     // Method for saving files - Removes duplication of code
     private void saveFile(File filename) {
         try {
@@ -331,23 +362,23 @@ public class EditorGUI extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        if(event.getSource() == newFile) {
+        if (event.getSource() == newFile) {
             new EditorGUI();
-        } else if(event.getSource() == openFile) {
+        } else if (event.getSource() == openFile) {
             JFileChooser open = new JFileChooser();
             open.showOpenDialog(null);
-            File file = open.getSelectedFile();                
+            File file = open.getSelectedFile();
             openingFiles(file);
-        } else if(event.getSource() == saveFile) {
+        } else if (event.getSource() == saveFile) {
             JFileChooser save = new JFileChooser();
             File filename = save.getSelectedFile();
-            if(opened == false && saved == false) {
+            if (opened == false && saved == false) {
                 save.showSaveDialog(null);
                 int confirmationResult;
-                if(filename.exists()) {
+                if (filename.exists()) {
                     confirmationResult = JOptionPane.showConfirmDialog(saveFile, "Replace existing file?");
-                    if(confirmationResult == JOptionPane.YES_OPTION) {
-                        saveFile(filename);                        
+                    if (confirmationResult == JOptionPane.YES_OPTION) {
+                        saveFile(filename);
                     }
                 } else {
                     saveFile(filename);
@@ -355,68 +386,89 @@ public class EditorGUI extends JFrame implements ActionListener {
             } else {
                 quickSave(openedFile);
             }
-        } else if(event.getSource() == saveAsFile) {
+        } else if (event.getSource() == saveAsFile) {
             JFileChooser saveAs = new JFileChooser();
             saveAs.showSaveDialog(null);
             File filename = saveAs.getSelectedFile();
             int confirmationResult;
-            if(filename.exists()) {
+            if (filename.exists()) {
                 confirmationResult = JOptionPane.showConfirmDialog(saveAsFile, "Replace existing file?");
-                if(confirmationResult == JOptionPane.YES_OPTION) {
-                    saveFile(filename);                        
+                if (confirmationResult == JOptionPane.YES_OPTION) {
+                    saveFile(filename);
                 }
             } else {
                 saveFile(filename);
             }
-        } else if(event.getSource() == pageSetup) {
+        } else if (event.getSource() == pageSetup) {
             job = PrinterJob.getPrinterJob();
-            format = job.pageDialog(job.defaultPage());    
-        } else if(event.getSource() == printFile) {
+            format = job.pageDialog(job.defaultPage());
+        } else if (event.getSource() == printFile) {
             job = PrinterJob.getPrinterJob();
-            if(job.printDialog()) {
+            if (job.printDialog()) {
                 try {
                     job.print();
                 } catch (PrinterException err) {
                     err.printStackTrace();
                 }
             }
-        } else if(event.getSource() == exit) {
+        } else if (event.getSource() == exit) {
             System.exit(0);
-        } else if(event.getSource() == undoEdit) {
+        } else if (event.getSource() == undoEdit) {
             try {
                 undo.undo();
-            } catch(CannotUndoException cu) {
+            } catch (CannotUndoException cu) {
                 cu.printStackTrace();
             }
-        } else if(event.getSource() == redoEdit) {
+        } else if (event.getSource() == redoEdit) {
             try {
                 undo.redo();
-            } catch(CannotUndoException cur) {
+            } catch (CannotUndoException cur) {
                 cur.printStackTrace();
             }
-        } else if(event.getSource() == selectAll) {
+        } else if (event.getSource() == selectAll) {
             textArea.selectAll();
-        }  else if(event.getSource() == copy) {
+        } else if (event.getSource() == copy) {
             textArea.copy();
-        } else if(event.getSource() == paste) {
+        } else if (event.getSource() == paste) {
             textArea.paste();
-        } else if(event.getSource() == cut) {
+            pos1=textArea.getCaretPosition();
+            textArea.insert(str, pos1);
+        } else if (event.getSource() == cut) {
             textArea.cut();
-        } else if(event.getSource() == aboutMe) {
-           About frame = new About();
-           frame.setVisible(true);
-           setDefaultCloseOperation(About.DISPOSE_ON_CLOSE);
-        } else if(event.getSource () == license) {
-            License frame = new License ();
+        } else if (event.getSource() == wordwrap) {
+            textArea.setLineWrap(true);
+        }else if(event.getSource() == timestamp) {  
+            GregorianCalendar gcalendar=new GregorianCalendar();  
+            String h=String.valueOf(gcalendar.get(Calendar.HOUR));  
+            String m=String.valueOf(gcalendar.get(Calendar.MINUTE));  
+            String s=String.valueOf(gcalendar.get(Calendar.SECOND));  
+            String date=String.valueOf(gcalendar.get(Calendar.DATE));  
+            String mon=months[gcalendar.get(Calendar.MONTH)];  
+            String year=String.valueOf(gcalendar.get(Calendar.YEAR));  
+            String hms="Time"+" - "+h+":"+m+":"+s+" Date"+" - "+date+" "+mon+" "+year+" ";  
+            int loc=textArea.getCaretPosition();  
+            textArea.insert(hms,loc);  
+        } else if (event.getSource() == aboutMe) {
+            About frame = new About();
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.setVisible(true);
-            setDefaultCloseOperation(License.DISPOSE_ON_CLOSE);
+        } else if (event.getSource() == license) {
+            License frame = new License();
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setVisible(true);
+        } else if (event.getSource() == helpTopics) {
+          Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+          try {
+            Desktop.getDesktop().browse(new URL("https://github.com/jgodwin13/jEdit/wiki").toURI());
+            } catch (URISyntaxException | IOException e) {}
+
         }
-        
+
     }
 
-    //============================================
-    // GETTERS AND SETTERS
-    //============================================
+    //============*=====*=======================
+    //// GETTERS AND SETTERS
+    //==================*=====*===================
 
     public JTextArea getTextArea() {
         return textArea;
